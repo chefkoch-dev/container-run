@@ -27,4 +27,4 @@ docker run --rm \
     -v /run/docker.sock:/run/docker.sock \
     -u $(id -u) \
     ${options} \
-    $@
+    "$@"
