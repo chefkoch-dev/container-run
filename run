@@ -21,7 +21,7 @@ for groupId in $(id -G); do
     options+=" --group-add ${groupId}"
 done
 
-CACHE_CONTAINER="cache-container-$(pwd | sha1sum | awk '{print $1}')"
+CACHE_CONTAINER=cache-container-$(pwd | (shasum || sha1sum) | awk '{print $1}')
 if ! docker ps -a --no-trunc | grep -q "${CACHE_CONTAINER}"; then
     docker run -v "${HOME}" -v /root --name="${CACHE_CONTAINER}" busybox install -d -o $(id -u) -g $(id -g) "${HOME}"
 fi
