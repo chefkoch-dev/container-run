@@ -18,6 +18,10 @@ if ! docker ps -a --no-trunc | grep -q "${CACHE_CONTAINER}"; then
     docker run -v ${HOME} -v /root --name=${CACHE_CONTAINER} busybox install -d -o $(id -u) -g $(id -g) ${HOME}
 fi
 
+for groupId in $(id -G); do
+    options+=" --group-add ${groupId}"
+done
+
 docker run --rm \
     -v $(pwd)/../:/app \
     -w /app \
