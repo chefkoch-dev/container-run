@@ -25,6 +25,7 @@ docker run --rm \
     -v /etc/passwd:/etc/passwd:ro \
     -v /etc/group:/etc/group:ro \
     -v /run/docker.sock:/run/docker.sock \
+    -e DOCKER_HOST=unix:///run/docker.sock \
     -u $(id -u):$(id -g) \
     ${options} \
     "$@"
