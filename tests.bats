@@ -1,4 +1,4 @@
-@test "--self-update repalces run executable" {
+@test "--self-update replaces run executable" {
     cp -a run ${BATS_TMPDIR}/run
     local before=$(stat -c '%Y' ${BATS_TMPDIR}/run)
     ${BATS_TMPDIR}/run --self-update
