@@ -2,30 +2,34 @@
 
 set -e
 
-pushd "$(dirname $0)" > /dev/null
-
 if [[ $1 == '--self-update' ]]; then
-	curl 'https://raw.githubusercontent.com/chefkoch-dev/docker-run/master/run' -o run
+	curl 'https://raw.githubusercontent.com/chefkoch-dev/docker-run/master/run' -o "${BASH_SOURCE[0]}"
 	exit
 fi
 
+if ! APP_DIR="$(git rev-parse --show-toplevel 2>/dev/null)"; then
+    APP_DIR="$(pwd)"
+fi
+
 options=''
-[[ -n ${SSH_AUTH_SOCK} ]] && options+=" -v ${SSH_AUTH_SOCK}:/run/ssh.sock -e SSH_AUTH_SOCK=/run/ssh.sock"
 
-CACHE_CONTAINER=cache-container-$(pwd | sha1sum | awk '{print $1}')
-
-if ! docker ps -a --no-trunc | grep -q "${CACHE_CONTAINER}"; then
-    docker run -v ${HOME} -v /root --name=${CACHE_CONTAINER} busybox install -d -o $(id -u) -g $(id -g) ${HOME}
+if [[ -n ${SSH_AUTH_SOCK} ]]; then
+    options+=" -v ${SSH_AUTH_SOCK}:/run/ssh.sock -e SSH_AUTH_SOCK=/run/ssh.sock"
 fi
 
 for groupId in $(id -G); do
     options+=" --group-add ${groupId}"
 done
 
+CACHE_CONTAINER="cache-container-$(pwd | sha1sum | awk '{print $1}')"
+if ! docker ps -a --no-trunc | grep -q "${CACHE_CONTAINER}"; then
+    docker run -v "${HOME}" -v /root --name="${CACHE_CONTAINER}" busybox install -d -o $(id -u) -g $(id -g) "${HOME}"
+fi
+
 docker run --rm \
-    -v $(pwd)/../:/app \
+    -v "${APP_DIR}":/app \
     -w /app \
-    --volumes-from=${CACHE_CONTAINER} \
+    --volumes-from="${CACHE_CONTAINER}" \
     -v /etc/passwd:/etc/passwd:ro \
     -v /etc/group:/etc/group:ro \
     -v /run/docker.sock:/run/docker.sock \

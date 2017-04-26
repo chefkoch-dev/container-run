@@ -1,11 +1,14 @@
 setup() {
     PROJECT=$(mktemp -d)
+    git init ${PROJECT}
     mkdir ${PROJECT}/docker
-    RUN=${PROJECT}/docker/run
-    cp -p run ${RUN}
+    RUN=docker/run
+    cp -p run ${PROJECT}/${RUN}
+    pushd ${PROJECT} >/dev/null
 }
 
 teardown() {
+    popd >/dev/null
     rm -rf ${PROJECT}
     unset PROJECT RUN
 }
@@ -52,12 +55,24 @@ teardown() {
     SSH_AUTH_SOCK=$(mktemp) ${RUN} --rm debian sh -c 'stat ${SSH_AUTH_SOCK}'
 }
 
-@test "current directory is preserved" {
+@test "current directory is preserved if a git repository is not available" {
     local testFile=$(mktemp -p ${PROJECT})
+    rm -rf ${PROJECT}/.git
     ${RUN} --rm debian stat ${testFile##*/}
 }
 
-@test "current directory is mounted as /app" {
+@test "current directory is mounted as /app if a git repository is not available" {
+    local testFile=$(mktemp -p ${PROJECT})
+    rm -rf ${PROJECT}/.git
+    ${RUN} --rm debian stat /app/${testFile##*/}
+}
+
+@test "git root directory is mounted as /app" {
     local testFile=$(mktemp -p ${PROJECT})
     ${RUN} --rm debian stat /app/${testFile##*/}
+}
+
+@test "git root is set as working directory" {
+    local testFile=$(mktemp -p ${PROJECT})
+    ${RUN} --rm debian stat ${testFile##*/}
 }
