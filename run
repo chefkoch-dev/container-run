@@ -3,7 +3,7 @@
 set -e
 
 if [[ $1 == '--self-update' ]]; then
-	curl 'https://raw.githubusercontent.com/chefkoch-dev/docker-run/master/run' -o "${BASH_SOURCE[0]}"
+	curl 'https://raw.githubusercontent.com/chefkoch-dev/container-run/master/run' -o "${BASH_SOURCE[0]}"
 	exit
 fi
 
