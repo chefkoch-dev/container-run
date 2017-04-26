@@ -1,52 +1,63 @@
+setup() {
+    PROJECT=$(mktemp -d)
+    mkdir ${PROJECT}/docker
+    RUN=${PROJECT}/docker/run
+    cp -p run ${RUN}
+}
+
+teardown() {
+    rm -rf ${PROJECT}
+    unset PROJECT RUN
+}
+
 @test "--self-update replaces run executable" {
-    cp -a run ${BATS_TMPDIR}/run
-    local before=$(stat -c '%Y' ${BATS_TMPDIR}/run)
-    ${BATS_TMPDIR}/run --self-update
-    local after=$(stat -c '%Y' ${BATS_TMPDIR}/run)
+    local before=$(stat -c '%Y' ${RUN})
+    ${RUN} --self-update
+    local after=$(stat -c '%Y' ${RUN})
     (( $before < $after ))
 }
 
 @test "run simple command" {
-    ./run --rm debian true
+    ${RUN} --rm debian true
 }
 
 @test "failures are propagated" {
-    run ./run --rm debian false
+    run ${RUN} --rm debian false
     [[ $status == 1 ]]
 }
 
 @test "host user is known in container" {
     local name=$(id -u -n)
-    run ./run --rm debian id -u -n
+    run ${RUN} --rm debian id -u -n
     [[ $output == $name ]]
 }
 
 @test "host group is known in container" {
     local group=$(id -g -n)
-    run ./run --rm debian id -g -n
+    run ${RUN} --rm debian id -g -n
     [[ $output == $group ]]
 }
 
 @test "docker server is accessible" {
-    ./run --rm docker docker info
+    ${RUN} --rm docker docker info
 }
 
 @test "home directories are persistent" {
-    local fileName=$(uuidgen)
-    ./run --rm debian touch ${HOME}/${fileName}
-    ./run --rm debian stat ${HOME}/${fileName}
+    local fileName=$(mktemp -p ${HOME})
+    ${RUN} --rm debian touch ${fileName}
+    ${RUN} --rm debian stat ${fileName}
 }
 
 @test "ssh agent is accessible" {
-    SSH_AUTH_SOCK=$(mktemp) ./run --rm debian sh -c 'stat ${SSH_AUTH_SOCK}'
+    SSH_AUTH_SOCK=$(mktemp) ${RUN} --rm debian sh -c 'stat ${SSH_AUTH_SOCK}'
 }
 
 @test "current directory is preserved" {
-    local testFile=${BATS_TEST_DIRNAME##*/}/${BATS_TEST_FILENAME##*/}
-    ./run --rm debian stat $testFile
+    local testFile=$(mktemp -p ${PROJECT})
+    ${RUN} --rm debian stat ${testFile##*/}
 }
 
 @test "current directory is mounted as /app" {
-    local testFile=${BATS_TEST_DIRNAME##*/}/${BATS_TEST_FILENAME##*/}
-    ./run --rm debian stat /app/$testFile
+    local testFile=$(mktemp -p ${PROJECT})
+    ${RUN} --rm debian stat /app/${testFile##*/}
 }
