@@ -34,7 +34,6 @@ if [ -n ${CONTAINER_RUN_NETWORK} ]; then
     options+=" --network=${CONTAINER_RUN_NETWORK}"
 fi
 
-
 docker run --rm \
     -v "${APP_DIR}":/app \
     -w /app \
