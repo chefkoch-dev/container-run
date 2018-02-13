@@ -38,8 +38,6 @@ if [ "${CONTAINER_RUN_INTERACTIVE}" == "true" ]; then
     options+=" -it"
 fi
 
-echo $options
-
 docker run --rm \
     -v "${APP_DIR}":/app \
     -w /app \
