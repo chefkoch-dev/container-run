@@ -34,6 +34,12 @@ if [ -n ${CONTAINER_RUN_NETWORK} ]; then
     options+=" --network=${CONTAINER_RUN_NETWORK}"
 fi
 
+if [ "${CONTAINER_RUN_INTERACTIVE}" == "true" ]; then
+    options+=" -it"
+fi
+
+echo $options
+
 docker run --rm \
     -v "${APP_DIR}":/app \
     -w /app \
