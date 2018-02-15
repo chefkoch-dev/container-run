@@ -38,9 +38,15 @@ if [ "${CONTAINER_RUN_INTERACTIVE}" == "true" ]; then
     options+=" -it"
 fi
 
+working_dir="/app"
+if [ -n "${CONTAINER_RUN_WORKING_DIR}" ]; then
+    local_dir=${PWD}
+    working_dir=${local_dir/$CONTAINER_RUN_WORKING_DIR/$working_dir}
+fi
+
 docker run --rm \
     -v "${APP_DIR}":/app \
-    -w /app \
+    -w "${working_dir}" \
     --volumes-from="${CACHE_CONTAINER}" \
     -v /etc/passwd:/etc/passwd:ro \
     -v /etc/group:/etc/group:ro \
