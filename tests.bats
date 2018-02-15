@@ -76,3 +76,9 @@ teardown() {
     local testFile=$(mktemp -p ${PROJECT})
     ${RUN} --rm debian stat ${testFile##*/}
 }
+
+@test ".env file is used" {
+    echo "FOO=BAR" > ${PROJECT}/.env
+    run ${RUN} --rm debian sh -c 'echo ${FOO}'
+    [[ $output == "BAR" ]]
+}
