@@ -14,6 +14,7 @@ teardown() {
 }
 
 @test "--self-update replaces run executable" {
+    touch -d 1982-02-05 ${RUN}
     local before=$(stat -c '%Y' ${RUN})
     ${RUN} --self-update
     local after=$(stat -c '%Y' ${RUN})
