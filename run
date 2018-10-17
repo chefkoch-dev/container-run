@@ -30,8 +30,12 @@ if [ -f ${APP_DIR}/.env ]; then
     options+=" --env-file=${APP_DIR}/.env"
 fi
 
-if [ -n ${CONTAINER_RUN_NETWORK} ]; then
+if [ -n "${CONTAINER_RUN_NETWORK}" ]; then
     options+=" --network=${CONTAINER_RUN_NETWORK}"
+fi
+
+if [ -n "${CONTAINER_RUN_DNS}" ]; then
+    options+=" --dns=${CONTAINER_RUN_DNS}"
 fi
 
 if [ "${CONTAINER_RUN_INTERACTIVE}" == "true" ]; then
