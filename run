@@ -54,8 +54,8 @@ docker run --rm \
     --volumes-from="${CACHE_CONTAINER}" \
     -v /etc/passwd:/etc/passwd:ro \
     -v /etc/group:/etc/group:ro \
-    -v /run/docker.sock:/run/docker.sock \
-    -e DOCKER_HOST=unix:///run/docker.sock \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -e DOCKER_HOST=unix:///var/run/docker.sock \
     -u $(id -u):$(id -g) \
     ${options} \
     "$@"
