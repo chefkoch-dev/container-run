@@ -23,7 +23,7 @@ done
 
 CACHE_CONTAINER=cache-container-$(pwd | (shasum || sha1sum) | awk '{print $1}')
 if ! docker ps -a --no-trunc | grep -q "${CACHE_CONTAINER}"; then
-    docker run -v "${HOME}" -v /root --name="${CACHE_CONTAINER}" busybox install -d -o $(id -u) -g $(id -g) --userns host "${HOME}"
+    docker run -v "${HOME}" -v /root --name="${CACHE_CONTAINER}" busybox install -d -o $(id -u) -g $(id -g) "${HOME}"
 fi
 
 if [ -f ${APP_DIR}/.env ]; then
@@ -39,6 +39,5 @@ docker run --rm \
     -v /run/docker.sock:/run/docker.sock \
     -e DOCKER_HOST=unix:///run/docker.sock \
     -u $(id -u):$(id -g) \
-    --userns host \
     ${options} \
     "$@"
